@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "mario_level_1.py", line 16, in <module>
+    main()
+  File "data\main.pyc", line 18, in main
+  File "data\tools.pyc", line 75, in main
+  File "data\tools.pyc", line 42, in update
+  File "data\states\level1.pyc", line 358, in update
+  File "data\states\level1.pyc", line 1365, in check_if_time_out
+  File "data\components\mario.pyc", line 692, in start_death_jump
+IndexError: list index out of range
