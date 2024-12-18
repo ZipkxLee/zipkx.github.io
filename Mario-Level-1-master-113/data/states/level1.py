@@ -1340,7 +1340,6 @@ class Level1(tools._State):
             self.persist[c.TOP_SCORE] = self.game_info[c.SCORE]
         if self.mario.dead:
             self.persist[c.LIVES] -= 1
-
         if self.persist[c.LIVES] == 0:
             self.next = c.GAME_OVER
             self.game_info[c.CAMERA_START_X] = 0
@@ -1380,22 +1379,24 @@ class Level1(tools._State):
 
     def update_while_in_castle(self):
         """Updates while Mario is in castle at the end of the level"""
-        for score in self.moving_score_list:
-            score.update(self.moving_score_list, self.game_info)
+        for moving_score in self.moving_score_list:
+            moving_scorescore.update(self.moving_score_list, self.game_info)
         self.overhead_info_display.update(self.game_info)
 
         if self.overhead_info_display.state == c.END_OF_LEVEL:
             self.state = c.FLAG_AND_FIREWORKS
             self.flag_pole_group.add(castle_flag.Flag(8745, 322))
+            final_score = self.game_info[c.SCORE]
+            score_obj = score.Score(0, 0, final_score)  # 確保此處使用的是正確的 score 模組
+            score_obj.update_rankings()
 
 
     def update_flag_and_fireworks(self):
         """Updates the level for the fireworks and castle flag"""
-        for score in self.moving_score_list:
-            score.update(self.moving_score_list, self.game_info)
+        for moving_score in self.moving_score_list:  # 更改循環變數名，避免覆蓋模組
+            moving_score.update(self.moving_score_list, self.game_info)
         self.overhead_info_display.update(self.game_info)
         self.flag_pole_group.update()
-
         self.end_game()
 
 

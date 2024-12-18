@@ -30,7 +30,7 @@ class OverheadInfo(object):
         self.player_name = setup.player_name
         
         self.font_path = "Iansui-Regular.ttf"  # 字型檔案路徑
-        self.font = pg.font.Font(self.font_path, 20)  # 設定字型大小 30
+        self.font = pg.font.Font(self.font_path, 24)  # 設定字型大小 30
         self.create_image_dict()
         self.create_score_group()
         self.create_info_labels()
@@ -42,6 +42,7 @@ class OverheadInfo(object):
         self.create_game_over_label()
         self.create_time_out_label()
         self.create_main_menu_labels()
+        
 
 
     def create_image_dict(self):
@@ -292,41 +293,46 @@ class OverheadInfo(object):
             self.flashing_coin.update(level_info[c.CURRENT_TIME])
 
 
-    def update_score_images(self, images, score):
-        """Updates what numbers are to be blitted for the score."""
-        # 轉換分數為字串
-        score_str = str(score).zfill(6)  # 預設為 6 位數，不足補 0
-        needed_length = len(score_str)
+    def update_score_images(self, images, score, x=75, y=55):
+        """Updates the score display using the TTF font."""
+        # 確保分數字串為 6 位數，不足補 0
+        score_str = str(score).zfill(6)
+        
+        # 確保 images 長度足夠，如果不足就補充
+        while len(images) < len(score_str):
+            images.append(Character(self.font.render('0', True, (255, 255, 255))))
 
-        # 確保 images 長度足夠
-        while len(images) < needed_length:
-            images.append(Character(self.image_dict['0']))  # 添加初始圖像
+        # 渲染並更新每個數字的位置
+        for index, digit in enumerate(score_str):
+            text_surface = self.font.render(digit, True, (255, 255, 255))  # 渲染單個數字
+            text_rect = text_surface.get_rect(topleft=(x + index * 15, y))  # 每個字的 x 間隔 15 像素
+            
+            images[index].image = text_surface
+            images[index].rect = text_rect
 
-        # 更新圖像數字
-        index = len(images) - 1
-        for digit in reversed(score_str):
-            rect = images[index].rect
-            images[index] = Character(self.image_dict[digit])
-            images[index].rect = rect
-            index -= 1
+        # 移除多餘的元素（如果有）
+        if len(images) > len(score_str):
+            images[:] = images[:len(score_str)]
+
 
     def update_count_down_clock(self, level_info):
-        """Updates current time"""
+        """Updates the countdown clock display using the TTF font."""
         if self.state == c.FAST_COUNT_DOWN:
             self.time -= 1
-
         elif (level_info[c.CURRENT_TIME] - self.current_time) > 400:
             self.current_time = level_info[c.CURRENT_TIME]
             self.time -= 1
-        self.count_down_images = []
-        self.create_label(self.count_down_images, str(self.time), 645, 55)
-        if len(self.count_down_images) < 2:
-            for i in range(2):
-                self.count_down_images.insert(0, Character(self.image_dict['0']))
-            self.set_label_rects(self.count_down_images, 645, 55)
-        elif len(self.count_down_images) < 3:
-            self.count_down_images.insert(0, Character(self.image_dict['0']))
-            self.set_label_rects(self.count_down_images, 645, 55)
+
+        # 渲染倒數時間為整串字串
+        time_str = str(self.time).zfill(3)  # 倒數時間至少 3 位數
+        text_surface = self.font.render(time_str, True, (255, 255, 255))  # 白色文字
+        text_rect = text_surface.get_rect(topleft=(645, 55))
+
+        # 清空舊的倒數圖像，加入新的渲染結果
+        self.count_down_images.clear()
+        self.count_down_images.append(Character(text_surface))
+        self.count_down_images[0].rect = text_rect
+
 
 
     def update_coin_total(self, level_info):

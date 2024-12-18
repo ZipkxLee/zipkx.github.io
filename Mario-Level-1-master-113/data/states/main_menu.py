@@ -95,7 +95,7 @@ class Menu(tools._State):
         """Updates the state every refresh"""
         self.current_time = current_time
         self.game_info[c.CURRENT_TIME] = self.current_time
-        self.update_cursor(keys)
+        self.update_cursor(keys, surface)
         self.overhead_info.update(self.game_info)
 
         surface.blit(self.background, self.viewport, self.viewport)
@@ -105,38 +105,30 @@ class Menu(tools._State):
         surface.blit(self.cursor.image, self.cursor.rect)
         self.overhead_info.draw(surface)
 
-    def update_cursor(self, keys):
+    def update_cursor(self, keys, surface):
         """Update the position of the cursor"""
         input_list = [pg.K_RETURN, pg.K_a, pg.K_s]
 
         if self.cursor.state == c.PLAYER1:
             self.cursor.rect.y = 358
             if keys[pg.K_DOWN]:
-                self.cursor.state = c.PLAYER2
-            for input in input_list:
-                if keys[input]:
-                    self.reset_game_info()
-                    self.done = True
-        elif self.cursor.state == c.PLAYER2:
-            self.cursor.rect.y = 403
-            if keys[pg.K_DOWN]:
                 self.cursor.state = "INPUT_NAME"
             if keys[pg.K_UP]:
                 self.cursor.state = c.PLAYER1
         elif self.cursor.state == "INPUT_NAME":
-            self.cursor.rect.y = 448
+            self.cursor.rect.y = 403
             if keys[pg.K_DOWN]:
                 self.cursor.state = "VIEW_RANK"
             if keys[pg.K_UP]:
-                self.cursor.state = c.PLAYER2
+                self.cursor.state = c.PLAYER1
             if keys[pg.K_RETURN]:
                 self.show_input_box()
         elif self.cursor.state == "VIEW_RANK":
-            self.cursor.rect.y = 493
+            self.cursor.rect.y = 448
             if keys[pg.K_UP]:
                 self.cursor.state = "INPUT_NAME"
             if keys[pg.K_RETURN]:
-                self.show_rankings()
+                self.show_rankings(surface)
 
     def show_input_box(self):
         """Displays a tkinter input box to input the player name"""
@@ -149,29 +141,63 @@ class Menu(tools._State):
         root.destroy()
         self.overhead_info = info.OverheadInfo(self.game_info, c.MAIN_MENU)
 
-    def show_rankings(self):
+    def show_rankings(self, surface):
         """Displays the top 3 rankings from a JSON file"""
         try:
             with open("score.json", "r") as file:
                 scores = json.load(file)
 
-            # 顯示排名視窗
-            rank_window = tk.Tk()
-            rank_window.title("排行榜 - 前三名")
-            rank_window.geometry("300x200")
+            # 創建一個半透明的矩形作為背景
+            ranking_bg = pg.Surface((400, 300))  # 排行榜背景尺寸
+            ranking_bg.fill((0, 0, 0))  # 黑色背景
+            ranking_bg.set_alpha(200)  # 半透明效果
+            bg_rect = ranking_bg.get_rect(center=(surface.get_width() // 2, surface.get_height() // 2))
 
-            for i in range(1, 4):
-                label = tk.Label(
-                    rank_window,
-                    text=f"排名 {i}: {scores[f'player{i}']} - 分數: {scores[f'score{i}']}",
-                    font=("Arial", 12),
-                )
-                label.pack()
+            # 設置字體
+            font = pg.font.Font("Iansui-Regular.ttf", 20)  # 普通字體大小
+            title_font = pg.font.Font("Iansui-Regular.ttf", 24)  # 標題字體大小
 
-            tk.Button(rank_window, text="關閉", command=rank_window.destroy).pack()
-            rank_window.mainloop()
+            # 監控排行榜的狀態
+            showing_rankings = True  # 排行榜顯示狀態
+
+            while showing_rankings:
+                # 塗黑畫面並繪製排行榜背景
+                surface.fill((0, 0, 0))
+                surface.blit(ranking_bg, bg_rect)
+
+                # 繪製標題
+                title_text = title_font.render("排行榜 - 前三名", True, (255, 255, 255))
+                title_rect = title_text.get_rect(center=(surface.get_width() // 2, bg_rect.y + 30))
+                surface.blit(title_text, title_rect)
+
+                # 繪製每個排名的玩家名稱和分數
+                for i in range(1, 4):
+                    rank_text = font.render(
+                        f"排名 {i}: {scores[f'player{i}']} - 分數: {scores[f'score{i}']}",
+                        True,
+                        (255, 255, 255),
+                    )
+                    rank_rect = rank_text.get_rect(center=(surface.get_width() // 2, bg_rect.y + 70 + (i * 40)))
+                    surface.blit(rank_text, rank_rect)
+
+                # 更新畫面
+                pg.display.flip()
+
+                # 檢測事件
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        # 如果玩家關閉窗口
+                        showing_rankings = False
+                        self.done = True
+                        self.next = None
+                    elif event.type == pg.KEYDOWN:
+                        # 如果按下 ESC 鍵，關閉排行榜
+                        if event.key == pg.K_RETURN:
+                            showing_rankings = False
+            self.cursor.state = c.PLAYER1
         except FileNotFoundError:
             print("找不到 score.json 檔案！")
+
 
     def reset_game_info(self):
         """Resets the game info in case of a Game Over and restart"""
