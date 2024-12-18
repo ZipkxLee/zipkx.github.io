@@ -225,16 +225,13 @@ class OverheadInfo(object):
         """Create labels for the MAIN MENU screen"""
         player_one_game = []
         player_two_game = []
-        top = []
-        top_score = []
+        scoreboard = []
 
-        self.create_label(player_one_game, '1 PLAYER GAME', 272, 360)
-        self.create_label(player_two_game, '2 PLAYER GAME', 272, 405)
-        self.create_label(top, 'TOP - ', 290, 465)
-        self.create_label(top_score, '000000', 400, 465)
+        self.create_label(player_one_game, '開始遊戲', 350, 360)
+        self.create_label(player_two_game, '修改名稱', 350, 403)
+        self.create_label(scoreboard, '查看排名', 350, 448)
 
-        self.main_menu_labels = [player_one_game, player_two_game,
-                                 top, top_score]
+        self.main_menu_labels = [player_one_game, player_two_game, scoreboard ]
 
 
     def update(self, level_info, mario=None):
@@ -249,7 +246,6 @@ class OverheadInfo(object):
         if self.state == c.MAIN_MENU:
             self.score = level_info[c.SCORE]
             self.update_score_images(self.score_images, self.score)
-            self.update_score_images(self.main_menu_labels[3], self.top_score)
             self.update_coin_total(level_info)
             self.flashing_coin.update(level_info[c.CURRENT_TIME])
 

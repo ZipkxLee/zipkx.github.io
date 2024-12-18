@@ -30,7 +30,7 @@ class Score:
 
         # Load custom font
         self.font_path = "Iansui-Regular.ttf"  # Replace with your font file path
-        self.font_size = 30  # Adjust font size
+        self.font_size = 15 # Adjust font size
         self.font = pg.font.Font(self.font_path, self.font_size)
 
         # Convert the score to a string for rendering
@@ -62,7 +62,7 @@ class Score:
         """Check if floating scores need to be deleted."""
         for i, score in enumerate(score_list):
             if int(score.score_string) == 1000:
-                if (score.y - score.y_vel) > 130:
+                if (score.y - score.y_vel) > 150:
                     score_list.pop(i)
             else:
                 if (score.y - score.y_vel) > 75:

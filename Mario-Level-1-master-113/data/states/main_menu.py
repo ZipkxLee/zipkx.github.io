@@ -39,7 +39,7 @@ class Menu(tools._State):
     def setup_cursor(self):
         """Creates the mushroom cursor to select 1, 2, or new options"""
         self.cursor = pg.sprite.Sprite()
-        dest = (220, 358)
+        dest = (300, 358)
         self.cursor.image, self.cursor.rect = self.get_image(
             24, 160, 8, 8, dest, setup.GFX['item_objects'])
         self.cursor.state = c.PLAYER1
@@ -113,8 +113,10 @@ class Menu(tools._State):
             self.cursor.rect.y = 358
             if keys[pg.K_DOWN]:
                 self.cursor.state = "INPUT_NAME"
-            if keys[pg.K_UP]:
-                self.cursor.state = c.PLAYER1
+            for input in input_list:
+                if keys[input]:
+                    self.reset_game_info()
+                    self.done = True
         elif self.cursor.state == "INPUT_NAME":
             self.cursor.rect.y = 403
             if keys[pg.K_DOWN]:
