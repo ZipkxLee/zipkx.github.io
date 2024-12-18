@@ -24,5 +24,5 @@ FONTS = tools.load_all_fonts(os.path.join("resources","fonts"))
 MUSIC = tools.load_all_music(os.path.join("resources","music"))
 GFX   = tools.load_all_gfx(os.path.join("resources","graphics"))
 SFX   = tools.load_all_sfx(os.path.join("resources","sound"))
-player_name = "ALVIN"  # 預設角色名稱
+player_name = "MARIO"  # 預設角色名稱
 

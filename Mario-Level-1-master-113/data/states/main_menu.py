@@ -164,7 +164,7 @@ class Menu(tools._State):
 
             while showing_rankings:
                 # 塗黑畫面並繪製排行榜背景
-                surface.fill((0, 0, 0))
+                surface.fill((15, 15, 15))
                 surface.blit(ranking_bg, bg_rect)
 
                 # 繪製標題
@@ -196,7 +196,7 @@ class Menu(tools._State):
                         # 如果按下 ESC 鍵，關閉排行榜
                         if event.key == pg.K_RETURN:
                             showing_rankings = False
-            self.cursor.state = c.PLAYER1
+            self.cursor.state = "INPUT_NAME"
         except FileNotFoundError:
             print("找不到 score.json 檔案！")
 
