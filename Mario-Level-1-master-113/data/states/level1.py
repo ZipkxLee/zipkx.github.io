@@ -15,6 +15,9 @@ from .. components import flagpole
 from .. components import info
 from .. components import score
 from .. components import castle_flag
+import tkinter as tk
+from tkinter import messagebox
+
 
 
 class Level1(tools._State):
@@ -23,6 +26,7 @@ class Level1(tools._State):
 
     def startup(self, current_time, persist):
         """Called when the State object is created"""
+        self.show_confirmation_message()  # 顯示確認提示框
         self.game_info = persist
         self.persist = self.game_info
         self.game_info[c.CURRENT_TIME] = current_time
@@ -51,6 +55,17 @@ class Level1(tools._State):
         self.setup_checkpoints()
         self.setup_spritegroups()
 
+    def show_confirmation_message(self):
+            """顯示確認提示框，等待玩家點擊確定"""
+            # 創建一個 Tkinter 根窗口
+            root = tk.Tk()
+            root.withdraw()  # 隱藏主窗口
+
+            # 顯示消息框
+            messagebox.showinfo("提示", "準備開始遊戲，請按下確認繼續！ (請務必切換至英文輸入法!)")
+
+            # 銷毀窗口
+            root.destroy()
 
     def setup_background(self):
         """Sets the background image, rect and scales it to the correct
